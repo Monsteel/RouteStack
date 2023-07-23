@@ -10,12 +10,12 @@ import SwiftUI
 
 public struct PathView<Destination: View, Data: Equatable>: View {
   var path: Binding<RoutePath<Data>?>
-  var destination: (Data?) -> Destination
+  var destination: (RoutePath<Data>.ID?, Data?) -> Destination
   @State var pushStack: [RoutePath<Data>]
   
   public init(
     path: Binding<RoutePath<Data>?>,
-    destination: @escaping (Data?) -> Destination
+    destination: @escaping (RoutePath<Data>.ID?, Data?) -> Destination
   ) {
     self.path = path
     self.destination = destination
@@ -99,7 +99,7 @@ public struct PathView<Destination: View, Data: Equatable>: View {
             PathView(path: Binding(get: { nextPushPathData }, set: { _, _ in}), destination: destination)
           }
         })
-      destination(path.wrappedValue?.data)
+      destination(path.wrappedValue?.id, path.wrappedValue?.data)
     }
   }
   
@@ -108,7 +108,7 @@ public struct PathView<Destination: View, Data: Equatable>: View {
       if canPush {
         pushableDestination
       } else {
-        destination(path.wrappedValue?.data)
+        destination(path.wrappedValue?.id, path.wrappedValue?.data)
       }
     }
     .sheet(

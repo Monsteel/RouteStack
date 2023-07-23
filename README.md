@@ -38,7 +38,7 @@ struct ContentView: View {
   }
 
   var body: some View {
-    RouteStack($routePaths, root: root) { path in
+    RouteStack($routePaths, root: root) { id, path in
       switch path {
         // path view 를 정의합니다. path에 따라 분기하여 정의할 수 있습니다.
       }
@@ -113,7 +113,7 @@ struct ContentView: View {
   }
 
   var body: some View {
-    RouteStack($routePaths, root: root) { path in
+    RouteStack($routePaths, root: root) { id, path in
       // 생략
       Button("work") {
         UIApplication.shared.open(URL(string: "routeStackExample://backToRoot")!)

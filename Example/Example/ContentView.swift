@@ -87,7 +87,7 @@ struct ContentView: View {
   }
   
   var body: some View {
-    RouteStack($routePaths, root: root) { path in
+    RouteStack($routePaths, root: root) { id, path in
       switch path {
       case let .first(value):
         VStack(alignment: .leading) {

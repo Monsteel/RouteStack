@@ -37,7 +37,7 @@ struct ContentView: View {
   }
 
   var body: some View {
-    RouteStack($routePaths, root: root) { path in
+    RouteStack($routePaths, root: root) { id, path in
       switch path {
         // Define path views here. You can use a switch statement to define views based on the path.
       }
@@ -112,7 +112,7 @@ struct ContentView: View {
   }
 
   var body: some View {
-    RouteStack($routePaths, root: root) { path in
+    RouteStack($routePaths, root: root) { id, path in
       // Omitted
       Button("work") {
         UIApplication.shared.open(URL(string: "routeStackExample://backToRoot")!)

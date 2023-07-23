@@ -12,7 +12,7 @@ import SwiftUI
 public struct RouteStack<Root: View, Destination: View, Data: Equatable>: View {
   var paths: Binding<[RoutePath<Data>]>
   var root: Root
-  var destination: (Data?) -> Destination?
+  var destination: (RoutePath<Data>.ID?, Data?) -> Destination?
   
   /// navigationStack에 반영 될 스택
   @State var pushStack: [RoutePath<Data>]
@@ -139,14 +139,14 @@ public struct RouteStack<Root: View, Destination: View, Data: Equatable>: View {
   public init(
     _ paths: Binding<RoutePaths<Data>>,
     @ViewBuilder root: () -> Root,
-    @ViewBuilder destination: @escaping (Data) -> Destination
+    @ViewBuilder destination: @escaping (RoutePath<Data>.ID, Data) -> Destination
   ) {
     self.paths = paths
     self.root = root()
     
-    self.destination = { data in
-      if let data = data {
-        return destination(data)
+    self.destination = { id, data in
+      if let id = id, let data = data {
+        return destination(id, data)
       } else {
         return nil
       }

@@ -40,9 +40,24 @@ extension Array where Element: RoutePathProtocol {
     self.removeAll()
   }
   
-  /// 사이즈 반환
+  /// 사이즈 계산
   public var size: Int {
-    return self.calculateSum(in: self)
+    return self.flatten.count
+  }
+  
+  /// 복잡한 재귀 배열을 1차원 배열로 사용합니다.
+  public var flatten: [Element] {
+    get {
+      var flattenedArray: [Element] = []
+      flattenRecursive(array: self, resultArray: &flattenedArray)
+      return flattenedArray
+    }
+    set {
+      var updatedArray: [Element] = []
+      var setArray: [Element] = newValue
+      setRecursive(array: &updatedArray, setArray: &setArray)
+      self = updatedArray
+    }
   }
 }
 
@@ -80,17 +95,7 @@ extension Array where Element: RoutePathProtocol {
       return appendLastPath(in: &nodes[nodes.count - 1].stack, element: element)
     }
   }
-  
-  /// 사이즈 계산
-  private func calculateSum(in nodes: [Element]) -> Int {
-    var sum = nodes.count
-    
-    for node in nodes {
-      sum += calculateSum(in: node.stack)
-    }
-    
-    return sum
-  }
+
 }
 
 extension Array where Element: RoutePathProtocol {
@@ -101,6 +106,29 @@ extension Array where Element: RoutePathProtocol {
     set {
       if let newValue = newValue, indices.contains(index) {
         self[index] = newValue
+      }
+    }
+  }
+}
+
+extension Array where Element: RoutePathProtocol {
+  private func flattenRecursive(array: [Element], resultArray: inout [Element]) {
+    for element in array {
+      resultArray.append(element)
+      flattenRecursive(array: element.stack, resultArray: &resultArray)
+    }
+  }
+  
+  private func setRecursive(array: inout [Element], setArray: inout [Element]) {
+    guard !setArray.isEmpty else { return }
+    
+    if let first = setArray.first, let index = array.firstIndex(where: { $0.id == first.id }) {
+      array[index] = first
+      setArray.removeFirst()
+      setRecursive(array: &array[index].stack, setArray: &setArray)
+    } else {
+      for i in 0..<array.count {
+        setRecursive(array: &array[i].stack, setArray: &setArray)
       }
     }
   }

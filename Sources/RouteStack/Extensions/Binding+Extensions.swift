@@ -9,13 +9,13 @@
 import Foundation
 import SwiftUI
 
-extension Binding: Equatable where Value == RoutePath {
+extension Binding: Equatable where Value: RoutePathProtocol {
   public static func == (lhs: Binding<Value>, rhs: Binding<Value>) -> Bool {
     lhs.wrappedValue == rhs.wrappedValue
   }
 }
 
-extension Binding: Hashable where Value == RoutePath {
+extension Binding: Hashable where Value: RoutePathProtocol {
   public func hash(into hasher: inout Hasher) {
     hasher.combine(self.wrappedValue)
   }

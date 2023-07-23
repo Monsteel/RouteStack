@@ -10,18 +10,18 @@ import Foundation
 
 // public API
 
-public typealias RoutePaths = [RoutePath]
+public typealias RoutePaths<T: Equatable> = [RoutePath<T>]
 
-extension Array where Element == RoutePath {
+extension Array where Element: RoutePathProtocol {
   
   /// 다음화면 이동 하나만
-  public mutating func moveTo(_ routePath: RoutePath) {
+  public mutating func moveTo(_ routePath: Element) {
     self.appendLastPath(in: &self, element: routePath)
   }
 
   /// 다음화면 여러개 이동
-  public mutating func moveTo(_ routePaths: [RoutePath]) {
-    var newArray: [RoutePath] = self
+  public mutating func moveTo(_ routePaths: [Element]) {
+    var newArray: [Element] = self
     for routePath in routePaths {
       newArray.appendLastPath(in: &newArray, element: routePath)
     }
@@ -49,7 +49,7 @@ extension Array where Element == RoutePath {
 
 // private API
 
-extension Array where Element == RoutePath {
+extension Array where Element: RoutePathProtocol {
   
   /// 마지막 path 제거
   private func removeLastPath(in node: inout Element) -> Element? {
@@ -66,7 +66,7 @@ extension Array where Element == RoutePath {
   }
   
   /// 마지막 path 추가
-  private func appendLastPath(in nodes: inout [RoutePath], element: RoutePath) {
+  private func appendLastPath(in nodes: inout [Element], element: Element) {
     if nodes.last == nil {
       return nodes.append(element)
     }
@@ -82,7 +82,7 @@ extension Array where Element == RoutePath {
   }
   
   /// 사이즈 계산
-  private func calculateSum(in nodes: [RoutePath]) -> Int {
+  private func calculateSum(in nodes: [Element]) -> Int {
     var sum = nodes.count
     
     for node in nodes {
@@ -93,7 +93,7 @@ extension Array where Element == RoutePath {
   }
 }
 
-extension Array where Element == RoutePath {
+extension Array where Element: RoutePathProtocol {
   subscript (safe index: Index) -> Element? {
     get {
       return indices.contains(index) ? self[index] : nil

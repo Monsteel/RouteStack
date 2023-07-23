@@ -8,14 +8,14 @@
 
 import SwiftUI
 
-public struct PathView<Destination: View>: View {
-  var path: Binding<RoutePath?>
-  var destination: (AnyHashable) -> Destination
-  @State var pushStack: [RoutePath]
+public struct PathView<Destination: View, Data: Equatable>: View {
+  var path: Binding<RoutePath<Data>?>
+  var destination: (Data?) -> Destination
+  @State var pushStack: [RoutePath<Data>]
   
   public init(
-    path: Binding<RoutePath?>,
-    destination: @escaping (AnyHashable) -> Destination
+    path: Binding<RoutePath<Data>?>,
+    destination: @escaping (Data?) -> Destination
   ) {
     self.path = path
     self.destination = destination
@@ -37,7 +37,7 @@ public struct PathView<Destination: View>: View {
   }
   
   /// push 할 path data
-  var nextPushPathData: Binding<RoutePath?> {
+  var nextPushPathData: Binding<RoutePath<Data>?> {
     return Binding(
       get: {
         if let index = self.path.wrappedValue?.pushStack.count {
@@ -55,7 +55,7 @@ public struct PathView<Destination: View>: View {
   }
   
   /// present 할 path 데이터
-  var nextPresentPathData: Binding<RoutePath?> {
+  var nextPresentPathData: Binding<RoutePath<Data>?> {
     return Binding(
       get: {
         if let index = self.path.wrappedValue?.stack.lastIndex(where: { $0.canPresent }) {
@@ -92,7 +92,7 @@ public struct PathView<Destination: View>: View {
   private var pushableDestination: some View {
     NavigationStack(path: $pushStack) {
       NavigationLink(value: self.nextPushPathData.wrappedValue, label: EmptyView.init).hidden()
-        .navigationDestination(for: RoutePath.self, destination: { nextPushPathData in
+        .navigationDestination(for: RoutePath<Data>.self, destination: { nextPushPathData in
           if self.nextPushPathData.wrappedValue != nil && self.nextPushPathData.wrappedValue?.id == nextPushPathData.id {
             PathView(path: self.nextPushPathData, destination: destination)
           } else {

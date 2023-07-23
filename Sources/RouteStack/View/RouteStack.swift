@@ -9,16 +9,16 @@
 import Foundation
 import SwiftUI
 
-public struct RouteStack<Root: View, Destination: View, Data: Hashable>: View {
-  var paths: Binding<[RoutePath]>
+public struct RouteStack<Root: View, Destination: View, Data: Equatable>: View {
+  var paths: Binding<[RoutePath<Data>]>
   var root: Root
-  var destination: (AnyHashable) -> Destination?
+  var destination: (Data?) -> Destination?
   
   /// navigationStack에 반영 될 스택
-  @State var pushStack: [RoutePath]
+  @State var pushStack: [RoutePath<Data>]
 
   /// push 할 패스 데이터
-  var nextPushPathData: Binding<RoutePath?> {
+  var nextPushPathData: Binding<RoutePath<Data>?> {
     return Binding(
       get: {
         let index = self.$pushStack.wrappedValue.count
@@ -32,7 +32,7 @@ public struct RouteStack<Root: View, Destination: View, Data: Hashable>: View {
   }
   
   /// present 할 패스 데이터
-  var nextPresentPathData: Binding<RoutePath?> {
+  var nextPresentPathData: Binding<RoutePath<Data>?> {
     return Binding(
       get: {
         if let index = paths.wrappedValue.lastIndex(where: { $0.isPresentable }) {
@@ -67,7 +67,7 @@ public struct RouteStack<Root: View, Destination: View, Data: Hashable>: View {
   public var body: some View {
     NavigationStack(path: $pushStack) {
       NavigationLink(value: self.nextPushPathData.wrappedValue, label: EmptyView.init).hidden()
-        .navigationDestination(for: RoutePath.self, destination: { nextPushPathData in
+        .navigationDestination(for: RoutePath<Data>.self, destination: { nextPushPathData in
           if self.nextPushPathData.wrappedValue != nil && self.nextPushPathData.wrappedValue?.id == nextPushPathData.id {
             PathView(path: self.nextPushPathData, destination: destination)
           } else {
@@ -97,7 +97,7 @@ public struct RouteStack<Root: View, Destination: View, Data: Hashable>: View {
       content: { PathView(path: nextPresentPathData, destination: destination) }
     )
     .onAppear {
-      var stack: [RoutePath] = []
+      var stack: [RoutePath<Data>] = []
       
       for path in self.paths.wrappedValue {
         if path.style == .push {
@@ -112,7 +112,7 @@ public struct RouteStack<Root: View, Destination: View, Data: Hashable>: View {
       }
     }
     .onChange(of: paths.wrappedValue, perform: { newValue in
-      var stack: [RoutePath] = []
+      var stack: [RoutePath<Data>] = []
       
       for path in self.paths.wrappedValue {
         if path.style == .push {
@@ -137,16 +137,15 @@ public struct RouteStack<Root: View, Destination: View, Data: Hashable>: View {
   }
   
   public init(
-    _ paths: Binding<RoutePaths>,
+    _ paths: Binding<RoutePaths<Data>>,
     @ViewBuilder root: () -> Root,
-    for: Data.Type,
     @ViewBuilder destination: @escaping (Data) -> Destination
   ) {
     self.paths = paths
     self.root = root()
     
     self.destination = { data in
-      if let data = data as? Data {
+      if let data = data {
         return destination(data)
       } else {
         return nil

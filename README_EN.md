@@ -29,7 +29,7 @@ enum Path: Hashable {
 }
 
 struct ContentView: View {
-  @State var routePaths: RoutePaths = .init()
+  @State var routePaths: RoutePaths<Path> = .init()
 
   @ViewBuilder
   func root() -> some View {
@@ -37,7 +37,7 @@ struct ContentView: View {
   }
 
   var body: some View {
-    RouteStack($routePaths, root: root, for: Path.self) { path in
+    RouteStack($routePaths, root: root) { path in
       switch path {
         // Define path views here. You can use a switch statement to define views based on the path.
       }
@@ -54,7 +54,7 @@ You can update routePaths using the provided API:
 
 ```swift
 struct ContentView: View {
-  @State var routePaths: RoutePaths = .init()
+  @State var routePaths: RoutePaths<Path> = .init()
 
   @ViewBuilder
   func root() -> some View {
@@ -104,7 +104,7 @@ You can use deeplinks to transition between views without directly accessing rou
 
 ```swift
 struct ContentView: View {
-  @State var routePaths: RoutePaths = .init()
+  @State var routePaths: RoutePaths<Path> = .init()
 
   @ViewBuilder
   func root() -> some View {
@@ -112,7 +112,7 @@ struct ContentView: View {
   }
 
   var body: some View {
-    RouteStack($routePaths, root: root, for: Path.self) { path in
+    RouteStack($routePaths, root: root) { path in
       // Omitted
       Button("work") {
         UIApplication.shared.open(URL(string: "routeStackExample://backToRoot")!)

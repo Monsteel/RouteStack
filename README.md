@@ -30,7 +30,7 @@ enum Path: Hashable {
 }
 
 struct ContentView: View {
-  @State var routePaths: RoutePaths = .init()
+  @State var routePaths: RoutePaths<Path> = .init()
 
   @ViewBuilder
   func root() -> some View {
@@ -38,7 +38,7 @@ struct ContentView: View {
   }
 
   var body: some View {
-    RouteStack($routePaths, root: root, for: Path.self) { path in
+    RouteStack($routePaths, root: root) { path in
       switch path {
         // path view 를 정의합니다. path에 따라 분기하여 정의할 수 있습니다.
       }
@@ -55,7 +55,7 @@ struct ContentView: View {
 
 ```swift
 struct ContentView: View {
-  @State var routePaths: RoutePaths = .init()
+  @State var routePaths: RoutePaths<Path> = .init()
 
   @ViewBuilder
   func root() -> some View {
@@ -105,7 +105,7 @@ routePaths에 직접적으로 접근하지 않고, deeplink를 활용해 화면�
 
 ```swift
 struct ContentView: View {
-  @State var routePaths: RoutePaths = .init()
+  @State var routePaths: RoutePaths<Path> = .init()
 
   @ViewBuilder
   func root() -> some View {
@@ -113,7 +113,7 @@ struct ContentView: View {
   }
 
   var body: some View {
-    RouteStack($routePaths, root: root, for: Path.self) { path in
+    RouteStack($routePaths, root: root) { path in
       // 생략
       Button("work") {
         UIApplication.shared.open(URL(string: "routeStackExample://backToRoot")!)

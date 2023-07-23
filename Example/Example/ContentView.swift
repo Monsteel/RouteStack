@@ -9,7 +9,7 @@ import SwiftUI
 import RouteStack
 
 struct ContentView: View {
-  @State var routePaths: RoutePaths = .init()
+  @State var routePaths: RoutePaths<Path> = .init()
   
   @ViewBuilder
   func root() -> some View {
@@ -87,7 +87,7 @@ struct ContentView: View {
   }
   
   var body: some View {
-    RouteStack($routePaths, root: root, for: Path.self) { path in
+    RouteStack($routePaths, root: root) { path in
       switch path {
       case let .first(value):
         VStack(alignment: .leading) {
@@ -185,7 +185,7 @@ struct ContentView: View {
   }
 }
 
-enum Path: Hashable {
+enum Path: Equatable {
   case first(String)
   case second(String)
   case third(String)

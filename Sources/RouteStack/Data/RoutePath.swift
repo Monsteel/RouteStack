@@ -8,21 +8,47 @@
 
 import Foundation
 
-public struct RoutePath: Hashable {
-  /// ID
-  let id: AnyHashable
+public protocol RoutePathProtocol: Hashable, Identifiable {
+  associatedtype Data = Equatable
 
-  /// Data
-  let data: AnyHashable
+  var data: Data { get }
 
   /// 해당 node에 해당하는 화면의 노출 스타일
-  let style: Style
+  var style: Style { get }
 
   /// 하위 node Stack
-  var stack: [RoutePath]
+  var stack: [Self] { get set }
+
+  /// navigationStack에 반영 될 스택
+  var pushStack: [Self] { get set }
+
+  /// 푸시 가능 여부 | navigationStack은 중첩되지 않으니까.. | 이게 true면 해당 path의 stack에다가 push node 쌓기
+  var canPush: Bool { get }
+
+  /// 프레젠트 가능 여부 | 이게 true면 해당 path의 stack에다가 present node 쌓기
+  var canPresent: Bool { get }
+  
+  /// sheet 혹은 cover 인가?
+  var isPresentable: Bool { get }
+}
+
+public struct RoutePath<T: Equatable>: RoutePathProtocol {
+  /// ID
+  public let id: AnyHashable
+  
+  public func hash(into hasher: inout Hasher) { hasher.combine(id) }
+
+  /// Data
+  public let data: T
+
+  /// 해당 node에 해당하는 화면의 노출 스타일
+  public let style: Style
+
+  /// 하위 node Stack
+  public var stack: [RoutePath]
   
   /// navigationStack에 반영 될 스택
-  var pushStack: [RoutePath] {
+  public var pushStack: [RoutePath] {
     get {
       var stack: [RoutePath] = []
       
@@ -49,7 +75,7 @@ public struct RoutePath: Hashable {
   }
 
   /// 푸시 가능 여부 | navigationStack은 중첩되지 않으니까.. | 이게 true면 해당 path의 stack에다가 push node 쌓기
-  var canPush: Bool {
+  public var canPush: Bool {
     switch self.style {
     case .cover:
       return true
@@ -61,12 +87,12 @@ public struct RoutePath: Hashable {
   }
 
   /// 프레젠트 가능 여부 | 이게 true면 해당 path의 stack에다가 present node 쌓기
-  var canPresent: Bool {
+  public var canPresent: Bool {
     return true
   }
   
   /// sheet 혹은 cover 인가?
-  var isPresentable: Bool {
+  public var isPresentable: Bool {
     switch self.style {
     case .cover:
       return true
@@ -79,7 +105,7 @@ public struct RoutePath: Hashable {
 
   public init(
     id: AnyHashable = UUID(),
-    data: AnyHashable,
+    data: T = UUID(),
     style: Style,
     stack: [RoutePath] = []
   ) {

@@ -11,7 +11,7 @@ import Foundation
 public protocol RoutePathProtocol: Hashable, Identifiable {
   associatedtype Data = Equatable
 
-  var data: Data { get }
+  var data: Data { get set }
 
   /// 해당 node에 해당하는 화면의 노출 스타일
   var style: Style { get }
@@ -39,7 +39,7 @@ public struct RoutePath<T: Equatable>: RoutePathProtocol {
   public func hash(into hasher: inout Hasher) { hasher.combine(id) }
 
   /// Data
-  public let data: T
+  public var data: T
 
   /// 해당 node에 해당하는 화면의 노출 스타일
   public let style: Style

@@ -53,7 +53,7 @@ extension Array where Element: RoutePathProtocol {
       return flattenedArray
     }
     set {
-      var updatedArray: [Element] = []
+      var updatedArray: [Element] = self
       var setArray: [Element] = newValue
       setRecursive(array: &updatedArray, setArray: &setArray)
       self = updatedArray

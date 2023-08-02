@@ -121,15 +121,15 @@ extension Array where Element: RoutePathProtocol {
   
   private func setRecursive(array: inout [Element], setArray: inout [Element]) {
     guard !setArray.isEmpty else { return }
-    
-    if let first = setArray.first, let index = array.firstIndex(where: { $0.id == first.id }) {
-      array[index] = first
-      setArray.removeFirst()
-      setRecursive(array: &array[index].stack, setArray: &setArray)
-    } else {
-      for i in 0..<array.count {
+
+    for i in 0 ..< array.count {
+      if let index = setArray.firstIndex(where: { $0.id == array[i].id }) {
+        array[i] = setArray[index]
+        setArray.remove(at: index)
         setRecursive(array: &array[i].stack, setArray: &setArray)
-      }
+        } else {
+          setRecursive(array: &array[i].stack, setArray: &setArray)
+        }
     }
   }
 }

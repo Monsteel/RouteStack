@@ -6,16 +6,15 @@
 //  Copyright © 2023 Tony. All rights reserved.
 //
 
-import Foundation
 import SwiftUI
 
 public enum Style: Hashable {
-  /// fullscreenCover
+  /// sheet
   case sheet(_ detents: Set<PresentationDetent> = [.large], _ indicatorVisibility: Visibility = .hidden)
-  
+
   /// fullscreenCover
   case cover
-  
-  /// navigationStack push
+
+  /// navigation
   case push
 }

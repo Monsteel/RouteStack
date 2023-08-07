@@ -30,7 +30,7 @@ enum Path: Hashable {
 }
 
 struct ContentView: View {
-  @State var routePaths: RoutePaths<Path> = .init()
+  @State var routePaths: [RoutePath<Path>] = .init()
 
   @ViewBuilder
   func root() -> some View {
@@ -49,34 +49,32 @@ struct ContentView: View {
 
 ### 기본적인 화면 전환 방법
 
-제공되는 API를 통해, routePaths를 업데이트 할 수 있습니다.
-
-> ⚠️ 제공되는 API이외에, Array 기반 함수를 직접적으로 사용할 경우 예기치 못한 작동을 일으킬 수 있습니다.
+Array 기반 API를 통해, routePaths를 업데이트 할 수 있습니다.
 
 ```swift
 struct ContentView: View {
-  @State var routePaths: RoutePaths<Path> = .init()
+  @State var routePaths: [RoutePath<Path>] = .init()
 
   @ViewBuilder
   func root() -> some View {
     Button("push") {
-      routePaths.moveTo(.init(data: Path.first("value"), style: .push))
+      routePaths.append(.init(data: Path.first("value"), style: .push))
     }
 
     Button("custom-sheet") {
-      routePaths.moveTo(.init(data: Path.first("value"), style: .sheet([.medium, .large], .visible)))
+      routePaths.append(.init(data: Path.first("value"), style: .sheet([.medium, .large], .visible)))
     }
 
     Button("normal") {
-      routePaths.moveTo(.init(data: Path.first("value"), style: .sheet()))
+      routePaths.append(.init(data: Path.first("value"), style: .sheet()))
     }
 
     Button("cover") {
-      routePaths.moveTo(.init(data: Path.first("value"), style: .push))
+      routePaths.append(.init(data: Path.first("value"), style: .push))
     }
 
     Button("cover -> push -> push") {
-      routePaths.moveTo([
+      routePaths.append(contentsOf: [
         .init(data: Path.first("value"), style: .cover),
         .init(data: Path.first("value"), style: .push),
         .init(data: Path.first("value"), style: .push),
@@ -84,11 +82,11 @@ struct ContentView: View {
     }
 
     Button("backToRoot") {
-      routePaths.backToRoot()
+      routePaths.removeAll()
     }
 
     Button("back") {
-      routePaths.back()
+      routePaths.removeLast()
     }
   }
 
@@ -105,7 +103,7 @@ routePaths에 직접적으로 접근하지 않고, deeplink를 활용해 화면�
 
 ```swift
 struct ContentView: View {
-  @State var routePaths: RoutePaths<Path> = .init()
+  @State var routePaths: [RoutePath<Path>] = .init()
 
   @ViewBuilder
   func root() -> some View {

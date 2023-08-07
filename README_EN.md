@@ -48,34 +48,32 @@ struct ContentView: View {
 
 ### Basic Screen Transition Methods
 
-You can update routePaths using the provided API:
-
-> ⚠️ Be cautious when using Array-based functions directly as they may cause unexpected behavior.
+You can update routePaths using the Array-based functions API:
 
 ```swift
 struct ContentView: View {
-  @State var routePaths: RoutePaths<Path> = .init()
+  @State var routePaths: [RoutePath<Path>] = .init()
 
   @ViewBuilder
   func root() -> some View {
     Button("push") {
-      routePaths.moveTo(.init(data: Path.first("value"), style: .push))
+      routePaths.append(.init(data: Path.first("value"), style: .push))
     }
 
     Button("custom-sheet") {
-      routePaths.moveTo(.init(data: Path.first("value"), style: .sheet([.medium, .large], .visible)))
+      routePaths.append(.init(data: Path.first("value"), style: .sheet([.medium, .large], .visible)))
     }
 
     Button("normal") {
-      routePaths.moveTo(.init(data: Path.first("value"), style: .sheet()))
+      routePaths.append(.init(data: Path.first("value"), style: .sheet()))
     }
 
     Button("cover") {
-      routePaths.moveTo(.init(data: Path.first("value"), style: .push))
+      routePaths.append(.init(data: Path.first("value"), style: .push))
     }
 
     Button("cover -> push -> push") {
-      routePaths.moveTo([
+      routePaths.append(contentsOf: [
         .init(data: Path.first("value"), style: .cover),
         .init(data: Path.first("value"), style: .push),
         .init(data: Path.first("value"), style: .push),
@@ -83,11 +81,11 @@ struct ContentView: View {
     }
 
     Button("backToRoot") {
-      routePaths.backToRoot()
+      routePaths.removeAll()
     }
 
     Button("back") {
-      routePaths.back()
+      routePaths.removeLast()
     }
   }
 
@@ -104,7 +102,7 @@ You can use deeplinks to transition between views without directly accessing rou
 
 ```swift
 struct ContentView: View {
-  @State var routePaths: RoutePaths<Path> = .init()
+  @State var routePaths: [RoutePath<Path>] = .init()
 
   @ViewBuilder
   func root() -> some View {

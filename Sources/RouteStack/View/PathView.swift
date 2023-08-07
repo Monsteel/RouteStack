@@ -58,7 +58,14 @@ public struct PathView<Destination: View, Data: Equatable>: View {
             updatedPaths.replaceSubrange(startIndex..<startIndex + firstPresentableIndex, with: newValue)
           } else {
             // 배열의 첫번째가 presentable하지 않은 경우, newValue의 크기만큼 paths 업데이트
-            updatedPaths.replaceSubrange(startIndex..., with: newValue)
+            for (index, newPath) in newValue.enumerated() {
+              if index < updatedPaths.count - startIndex {
+                let existingPath = updatedPaths[startIndex + index]
+                if existingPath.id == newPath.id {
+                  updatedPaths[startIndex + index] = newPath
+                }
+              }
+            }
           }
           
           allPaths.wrappedValue = updatedPaths

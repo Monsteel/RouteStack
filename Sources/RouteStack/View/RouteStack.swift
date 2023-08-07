@@ -48,7 +48,14 @@ public struct RouteStack<Root: View, Destination: View, Data: Equatable>: View {
           updatedPaths.replaceSubrange(0 ..< firstPresentableIndex, with: newValue)
         } else {
           // 배열의 첫번째가 presentable하지 않은 경우, newValue의 크기만큼 paths 업데이트
-          updatedPaths.replaceSubrange(0..., with: newValue)
+          for (index, newPath) in newValue.enumerated() {
+            if index < updatedPaths.count {
+              let existingPath = updatedPaths[index]
+              if existingPath.id == newPath.id {
+                updatedPaths[index] = newPath
+              }
+            }
+          }
         }
         
         allPaths.wrappedValue = updatedPaths

@@ -23,52 +23,54 @@ public struct PathView<Destination: View, Data: Equatable>: View {
     return Binding(
       get: {
         // scopePaths를 기반으로 현재 path에서 다룰 수 있는 paths를 반환합니다.
-        
+
         if let currentIndex = allPaths.wrappedValue.firstIndex(of: currentPath) {
           // 현재 path부터 모든 배열
           let remainingPaths = allPaths.wrappedValue.suffix(from: currentIndex + 1)
-          
+
           // 현재 path부터 다룰 수 있는 범위까지의 배열
-          var filteredPaths: [RoutePath<Data>] = []
-          
+          var scopePaths: [RoutePath<Data>] = []
+
           // 배열의 첫번째가 presentable하거나, 그렇지 않은 경우에 따라 분기
           if let firstPresentablePath = remainingPaths.first, firstPresentablePath.isPresented == true {
             // 배열의 첫번째가 presentable한 경우, 해당 path만 포함시겨 반환
-            filteredPaths = [firstPresentablePath]
+            scopePaths = [firstPresentablePath]
           } else if self.currentPath.isPresented {
             // 배열의 첫번째가 presentable하지 않고, currentPath가 presentable한 경우,
             // presentable 값을 만나기 전까지의 isPushable한 path를 반환
-            filteredPaths = remainingPaths.prefix { $0.isPushed }
+            scopePaths = remainingPaths.prefix { $0.isPushed }
           }
-          
-          return filteredPaths
+
+          return scopePaths
         }
         return []
       },
       set: { newValue in
         // newValue를 기반으로 현재 path 이후의 paths를 업데이트합니다.
-        
+
         if let currentIndex = allPaths.wrappedValue.firstIndex(of: currentPath) {
+          // 현재 path부터 모든 배열
+          let remainingPaths = allPaths.wrappedValue.suffix(from: currentIndex + 1)
+
+          // 현재 path부터 다룰 수 있는 범위까지의 배열
+          var scopePaths: [RoutePath<Data>] = []
+
+          // 배열의 첫번째가 presentable하거나, 그렇지 않은 경우에 따라 분기
+          if let firstPresentablePath = remainingPaths.first, firstPresentablePath.isPresented == true {
+            // 배열의 첫번째가 presentable한 경우, 해당 path만 포함시겨 반환
+            scopePaths = [firstPresentablePath]
+          } else if self.currentPath.isPresented {
+            // 배열의 첫번째가 presentable하지 않고, currentPath가 presentable한 경우,
+            // presentable 값을 만나기 전까지의 isPushable한 path를 반환
+            scopePaths = remainingPaths.prefix { $0.isPushed }
+          }
+
           let startIndex = currentIndex + 1
           var updatedPaths = allPaths.wrappedValue
-          
-          // 배열의 첫번째가 presentable하거나, 그렇지 않은 경우에 따라 분기
-          if let firstPresentableIndex = newValue.firstIndex(where: { $0.isPresented }) {
-            // 배열의 첫번째가 presentable한 경우, 해당 path만 업데이트
-            updatedPaths.replaceSubrange(startIndex..<startIndex + firstPresentableIndex, with: newValue)
-          } else {
-            // 배열의 첫번째가 presentable하지 않은 경우, newValue의 크기만큼 paths 업데이트
-            for (index, newPath) in newValue.enumerated() {
-              if index < updatedPaths.count - startIndex {
-                let existingPath = updatedPaths[startIndex + index]
-                if existingPath.id == newPath.id {
-                  updatedPaths[startIndex + index] = newPath
-                }
-              }
-            }
-          }
-          
-          allPaths.wrappedValue = updatedPaths
+
+          updatedPaths.replaceSubrange(startIndex ..< startIndex + scopePaths.count, with: newValue)
+
+          self.allPaths.wrappedValue = updatedPaths
         }
       }
     )
@@ -162,10 +164,10 @@ public struct PathView<Destination: View, Data: Equatable>: View {
         if let currentIndex = allPaths.wrappedValue.firstIndex(of: currentPath) {
           // 현재 path부터 모든 배열
           let remainingPaths = allPaths.wrappedValue.suffix(from: currentIndex + 1)
-          
+
           // 현재 path부터 다룰 수 있는 범위까지의 배열
           var filteredPaths: [RoutePath<Data>] = []
-          
+
           // 배열의 첫번째가 presentable하거나, 그렇지 않은 경우에 따라 분기
           if let firstPresentablePath = remainingPaths.first, firstPresentablePath.isPresented == true {
             // 배열의 첫번째가 presentable한 경우, 해당 path만 포함시겨 반환
@@ -175,12 +177,12 @@ public struct PathView<Destination: View, Data: Equatable>: View {
             // presentable 값을 만나기 전까지의 isPushable한 path를 반환
             filteredPaths = remainingPaths.prefix { $0.isPushed }
           }
-          
+
           return filteredPaths
         }
         return []
       }
-      let stack = scopePaths.prefix { $0.style == .push }
+      let stack = scopePaths.prefix { $0.isPushed }
       self._navigationStack = .init(wrappedValue: Array(stack))
     } else {
       self._navigationStack = .init(initialValue: [])

@@ -22,43 +22,44 @@ public struct RouteStack<Root: View, Destination: View, Data: Equatable>: View {
   private var scopePaths: Binding<[RoutePath<Data>]> {
     return Binding(
       get: {
-        let remainingPaths = allPaths.wrappedValue
-        
+        // scopePaths를 기반으로 현재 path에서 다룰 수 있는 paths를 반환합니다.
+
         // 현재 path부터 다룰 수 있는 범위까지의 배열
-        var filteredPaths: [RoutePath<Data>] = []
-        
+        var scopePaths: [RoutePath<Data>] = []
+
         // 배열의 첫번째가 presentable하거나, 그렇지 않은 경우에 따라 분기
-        if let firstPresentablePath = remainingPaths.first, firstPresentablePath.isPresented == true {
+        if let firstPresentablePath = allPaths.wrappedValue.first, firstPresentablePath.isPresented == true {
           // 배열의 첫번째가 presentable한 경우, 해당 path만 포함시겨 반환
-          filteredPaths = [firstPresentablePath]
+          scopePaths = [firstPresentablePath]
         } else {
           // 배열의 첫번째가 presentable하지 않고, currentPath가 presentable한 경우,
           // presentable 값을 만나기 전까지의 isPushable한 path를 반환
-          filteredPaths = remainingPaths.prefix { $0.isPushed }
+          scopePaths = allPaths.wrappedValue.prefix { $0.isPushed }
         }
-        
-        return filteredPaths
+
+        return scopePaths
       },
       set: { newValue in
-        var updatedPaths = allPaths.wrappedValue
-        
+        // newValue를 기반으로 현재 path 이후의 paths를 업데이트합니다.
+
+        // 현재 path부터 다룰 수 있는 범위까지의 배열
+        var scopePaths: [RoutePath<Data>] = []
+
         // 배열의 첫번째가 presentable하거나, 그렇지 않은 경우에 따라 분기
-        if let firstPresentableIndex = newValue.firstIndex(where: { $0.isPresented }) {
-          // 배열의 첫번째가 presentable한 경우, 해당 path만 업데이트
-          updatedPaths.replaceSubrange(0 ..< firstPresentableIndex, with: newValue)
+        if let firstPresentablePath = allPaths.wrappedValue.first, firstPresentablePath.isPresented == true {
+          // 배열의 첫번째가 presentable한 경우, 해당 path만 포함시겨 반환
+          scopePaths = [firstPresentablePath]
         } else {
-          // 배열의 첫번째가 presentable하지 않은 경우, newValue의 크기만큼 paths 업데이트
-          for (index, newPath) in newValue.enumerated() {
-            if index < updatedPaths.count {
-              let existingPath = updatedPaths[index]
-              if existingPath.id == newPath.id {
-                updatedPaths[index] = newPath
-              }
-            }
-          }
+          // 배열의 첫번째가 presentable하지 않고, currentPath가 presentable한 경우,
+          // presentable 값을 만나기 전까지의 isPushable한 path를 반환
+          scopePaths = allPaths.wrappedValue.prefix { $0.isPushed }
         }
-        
-        allPaths.wrappedValue = updatedPaths
+
+        var updatedPaths = allPaths.wrappedValue
+
+        updatedPaths.replaceSubrange(0 ..< scopePaths.count, with: newValue)
+
+        self.allPaths.wrappedValue = updatedPaths
       }
     )
   }

@@ -16,7 +16,7 @@ public struct PathView<Destination: View, Data: Equatable>: View {
   private var currentPath: RoutePath<Data>
 
   /// 목적지 화면
-  private var destination: (RoutePath<Data>.ID, Data) -> Destination
+  private var destination: (RoutePath<Data>) -> Destination
 
   /// 현재 path에서 다룰 수 있는 path들
   private var scopePaths: Binding<[RoutePath<Data>]> {
@@ -147,14 +147,14 @@ public struct PathView<Destination: View, Data: Equatable>: View {
             destination: self.destination
           )
         }
-      destination(currentPath.id, currentPath.data)
+      destination(currentPath)
     }
   }
 
   public init(
     allPaths: Binding<[RoutePath<Data>]>,
     currentPath: RoutePath<Data>,
-    destination: @escaping (RoutePath<Data>.ID, Data) -> Destination
+    destination: @escaping (RoutePath<Data>) -> Destination
   ) {
     self.allPaths = allPaths
     self.currentPath = currentPath
@@ -194,7 +194,7 @@ public struct PathView<Destination: View, Data: Equatable>: View {
       if self.currentPath.isPresented {
         pushableDestination
       } else {
-        destination(self.currentPath.id, self.currentPath.data)
+        destination(self.currentPath)
       }
     }
     .sheet(

@@ -13,7 +13,7 @@ public struct RouteStack<Root: View, Destination: View, Data: Equatable>: View {
   private var allPaths: Binding<[RoutePath<Data>]>
 
   /// 목적지 화면
-  private var destination: (RoutePath<Data>.ID, Data) -> Destination
+  private var destination: (RoutePath<Data>) -> Destination
 
   /// root 화면
   private var root: Root
@@ -123,7 +123,7 @@ public struct RouteStack<Root: View, Destination: View, Data: Equatable>: View {
   public init(
     _ paths: Binding<[RoutePath<Data>]>,
     @ViewBuilder root: () -> Root,
-    @ViewBuilder destination: @escaping (RoutePath<Data>.ID, Data) -> Destination
+    @ViewBuilder destination: @escaping (RoutePath<Data>) -> Destination
   ) {
     self.allPaths = paths
     self.root = root()

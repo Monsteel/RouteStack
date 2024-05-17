@@ -88,8 +88,8 @@ struct ContentView: View {
   }
 
   var body: some View {
-    RouteStack($routePaths, root: root) { id, path in
-      switch path {
+    RouteStack($routePaths, root: root) { path in
+      switch path.data {
       case let .first(value):
         VStack(alignment: .leading) {
           Text("First View 입니다.")
